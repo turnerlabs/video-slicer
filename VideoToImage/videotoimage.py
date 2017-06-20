@@ -29,18 +29,16 @@ def convertVideoToImage(srcKey, srcBucket):
     except Error as e:
         print("Error calling ffmpeg:", e)
     #Upload file to s3
-    tmpKey = srcKey.split("/")
-    #Removing the video name from the file path
-    destKey=''
-    for i in range(0,len(tmpKey)-1):
-        destKey = destKey+tmpKey[i]+"/"
+    tmpKey = srcKey.rsplit(".",1)
+    #Removing the video extention
+    destKey = tmpKey[0]
 
     for imgFile in os.listdir(OUTPUT):
         if imgFile.find("img") != -1:
             with open(OUTPUT+imgFile, "rb") as imageFile:
                 f = imageFile.read()
                 imgByteArr = bytearray(f)
-                destination = destKey+'video-images/'+str(datetime.datetime.now())+str(imgFile)
+                destination = destKey+'/'+str(datetime.datetime.now())+str(imgFile)
                 object = s3.Bucket(srcBucket).put_object(Body = imgByteArr, Key = destination)
 
 
