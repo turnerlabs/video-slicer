@@ -1,9 +1,11 @@
+from __future__ import division
 import botocore
 import subprocess as sp
 import os
 import boto3
 import datetime
 import sys
+
 
 #No. of frames per second
 FRAMES = int(os.environ.get('FRAMESPERSEC','1'))
@@ -33,12 +35,18 @@ def convertVideoToImage(srcKey, srcBucket):
     #Removing the video extention
     destKey = tmpKey[0]
 
+    n = 1
     for imgFile in os.listdir(OUTPUT):
         if imgFile.find("img") != -1:
             with open(OUTPUT+imgFile, "rb") as imageFile:
                 f = imageFile.read()
                 imgByteArr = bytearray(f)
-                destination = destKey+'/'+str(datetime.datetime.now())+str(imgFile)
+                #timestamp of each frame in video 
+                timestamp = 1/FRAMES*n
+                strtimestamp = str(round(timestamp,2))
+                destination = destKey+'/'+strtimestamp+'_'+str(imgFile)
+                print destination
+                n = n+1
                 object = s3.Bucket(srcBucket).put_object(Body = imgByteArr, Key = destination)
 
 
