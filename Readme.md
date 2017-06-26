@@ -1,5 +1,6 @@
-# Video Splicer
-##Chops video into images
+# Video Slicer
+
+## Chops video into images
 
 It downloads a file from s3 and uploads it back to s3 after chopping the images locally.
 
