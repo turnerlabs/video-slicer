@@ -42,7 +42,7 @@ def convertVideoToImage(srcKey, srcBucket):
                 f = imageFile.read()
                 imgByteArr = bytearray(f)
                 #timestamp of each frame in video 
-                timestamp = 1/FRAMES*n
+                timestamp = (1/FRAMES)*n
                 strtimestamp = str(round(timestamp,2))
                 destination = destKey+'/'+strtimestamp+'_'+str(imgFile)
                 print destination
