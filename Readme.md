@@ -1,11 +1,22 @@
-# Video Splicer
-##Chops video into images
+# Video Slicer
+
+## Chops video into images
 
 It downloads a file from s3 and uploads it back to s3 after chopping the images locally.
 
 Install ffmpeg into the console before running the code.
-Following command installs ffmpeg:
-```brew install ffmpeg --with-fdk-aac --with-ffplay --with-freetype --with-frei0r --with-libass --with-libvo-aacenc --with-libvorbis --with-libvpx --with-opencore-amr --with-openjpeg --with-opus --with-rtmpdump --with-schroedinger --with-speex --with-theora --with-tools```
+
+mac:
+
+```
+brew install ffmpeg --with-fdk-aac --with-ffplay --with-freetype --with-frei0r --with-libass --with-libvo-aacenc --with-libvorbis --with-libvpx --with-opencore-amr --with-openjpeg --with-opus --with-rtmpdump --with-schroedinger --with-speex --with-theora --with-tools
+```
+
+docker:
+```
+docker build -t video-slicer .
+docker run -it -v ~/.aws/:/root/.aws -e BUCKET="$BUCKET" -e FILE="$FILE"  turnerlabs/video-slicer
+```
 
 
 The FRAMESPERSEC environment variable can be used to define the number of image shots you want per second.
