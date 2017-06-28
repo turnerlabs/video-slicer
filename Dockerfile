@@ -1,4 +1,4 @@
-from turnerlabs/video-splicer-base
+from turnerlabs/video-slicer-base
 
 ADD . /opt/app/
 
