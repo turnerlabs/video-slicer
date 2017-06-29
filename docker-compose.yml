@@ -1,0 +1,11 @@
+version: "2"
+services:
+  video-slicer:
+    image: turnerlabs/video-slicer
+    environment:
+      REGION: "us-east-1"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+    labels:
+      composeToBatch.vcpus: "8"
+      composeToBatch.memory: "20000"
