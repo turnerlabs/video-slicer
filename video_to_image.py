@@ -5,14 +5,19 @@ import os
 import boto3
 import datetime
 import sys
+import zipfile
 
 
 #No. of frames per second
 FRAMES = int(os.environ.get('FRAMESPERSEC','1'))
 TMP_DIR = "/tmp/output/"
+TMP_RENAME = TMP_DIR + "renamed/"
 
 if not os.path.exists(TMP_DIR):
     os.makedirs(TMP_DIR)
+
+if not os.path.exists(TMP_RENAME):
+    os.makedirs(TMP_RENAME)
 
 def convertVideoToImage(srcKey, srcBucket):
     s3 = boto3.resource('s3')
@@ -34,24 +39,25 @@ def convertVideoToImage(srcKey, srcBucket):
         sp.call(cmd,shell=True)
     except Exception as e:
         print("Error calling ffmpeg:", e)
+
     # Upload file to s3
     tmpKey = srcKey.rsplit(".",1)
     # Removing the video extention
     destKey = tmpKey[0]
 
     n = 1
-    for imgFile in sorted(os.listdir(TMP_DIR)):
-        if imgFile.find("img") != -1:
-            with open(TMP_DIR + imgFile, "rb") as imageFile:
-                f = imageFile.read()
-                imgByteArr = bytearray(f)
-                #timestamp of each frame in video
+    with zipfile.ZipFile('images.zip', 'w') as myzip:
+        for imgFile in sorted(os.listdir(TMP_DIR)):
+            if imgFile.find("img") != -1:
                 timestamp = (1/FRAMES)*n
                 strtimestamp = str(round(timestamp,2))
-                destination = destKey+'/'+strtimestamp+'_'+str(imgFile)
-                print destination
+                filename = strtimestamp+'_'+str(imgFile)
                 n = n+1
-                object = s3.Bucket(srcBucket).put_object(Body=imgByteArr, Key=destination)
+                print TMP_RENAME + filename
+                os.rename(TMP_DIR + imgFile, TMP_RENAME + filename)
+                myzip.write(TMP_RENAME + filename)
+
+    s3.Bucket(srcBucket).put_object(Body=open("./images.zip", 'rb'), Key=destKey + "/images.zip")
 
 
 if __name__ == '__main__':
