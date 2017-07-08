@@ -7,7 +7,7 @@ variable "name" {}
 
 variable "batch_job_definition" {}
 variable "batch_job_queue" {}
-variable "schedule_expression" {}
+variable "chaqer_lambda_arn" {}
 variable "bucket" {}
 variable "bucket_arn" {}
 
@@ -79,6 +79,13 @@ resource "aws_lambda_alias" "alias" {
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = "${var.bucket}"
+
+  lambda_function {
+    lambda_function_arn = "${var.chaqer_lambda_arn}"
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "videos/"
+    filter_suffix       = ".zip"
+  }
 
   lambda_function {
     lambda_function_arn = "${aws_lambda_function.func.arn}"
