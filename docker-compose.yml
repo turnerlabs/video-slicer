@@ -7,5 +7,5 @@ services:
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
     labels:
-      composeToBatch.vcpus: "8"
-      composeToBatch.memory: "200000"
+      composeToBatch.vcpus: 8
+      composeToBatch.memory: 200000

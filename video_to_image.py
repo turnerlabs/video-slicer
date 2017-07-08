@@ -57,7 +57,7 @@ def convertVideoToImage(srcKey, srcBucket):
                 os.rename(TMP_DIR + imgFile, TMP_RENAME + filename)
                 myzip.write(TMP_RENAME + filename)
 
-    s3.Bucket(srcBucket).put_object(Body=open("./images.zip", 'rb'), Key=destKey + "/images.zip")
+    s3.Bucket(srcBucket).put_object(Body=open("./images.zip", 'rb'), Key=destKey + ".zip")
 
 
 if __name__ == '__main__':
