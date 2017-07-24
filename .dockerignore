@@ -1,0 +1,7 @@
+.DS_Store
+*.tfvars
+*.tfstate
+*.tfstate.backup
+*.zip
+*.json
+.terraform/
