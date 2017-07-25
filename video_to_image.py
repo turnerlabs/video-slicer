@@ -6,10 +6,11 @@ import boto3
 import datetime
 import sys
 import zipfile
+import math
 
 
 #No. of frames per second
-FRAMES = int(os.environ.get('FRAMESPERSEC','1'))
+FRAMES = float(os.environ.get('FRAMESPERSEC','1'))
 TMP_DIR = "/tmp/output/"
 TMP_RENAME = TMP_DIR + "renamed/"
 
@@ -18,6 +19,10 @@ if not os.path.exists(TMP_DIR):
 
 if not os.path.exists(TMP_RENAME):
     os.makedirs(TMP_RENAME)
+
+def getLength(video):
+    val = sp.check_output('ffprobe -i ' + str(video)+ ' -show_entries format=duration -v quiet -of csv="p=0"',stdin=None, stderr=None, shell=True, universal_newlines=False)
+    return val
 
 def convertVideoToImage(srcKey, srcBucket):
     s3 = boto3.resource('s3')
@@ -34,8 +39,16 @@ def convertVideoToImage(srcKey, srcBucket):
             raise
     # Chop video into images(-i is the input file name, -r is the number of frames per sec, img_%04d.jpg is the o/p format)
     try:
-        cmd='ffmpeg -i ' + str(localFilename)+ ' -r ' + str(FRAMES) + ' ' + TMP_DIR + 'img_%04d.jpg'
-        print cmd
+        #Get length of the video
+        vidLength = float(getLength(localFilename))
+        print vidLength
+        imagesNo = vidLength*FRAMES
+        imagesNo = math.ceil(imagesNo)
+        imagesNo = int(imagesNo)
+        print imagesNo
+        #cmd='ffmpeg -i ' + str(localFilename)+ ' -r ' + str(FRAMES) + ' ' + TMP_DIR + 'img_%04d.jpg'
+        cmd = 'ffmpeg -i ' + str(localFilename) + ' -ss 00:00:0.0 -vf fps=' +str(FRAMES)+ ' -vframes ' + str(imagesNo) + ' ' + TMP_DIR + 'img_%04d.jpg'
+        #print cmd
         sp.call(cmd,shell=True)
     except Exception as e:
         print("Error calling ffmpeg:", e)
@@ -49,7 +62,7 @@ def convertVideoToImage(srcKey, srcBucket):
     with zipfile.ZipFile('images.zip', 'w') as myzip:
         for imgFile in sorted(os.listdir(TMP_DIR)):
             if imgFile.find("img") != -1:
-                timestamp = (1/FRAMES)*n
+                timestamp = (1/FRAMES)*(n-1)
                 strtimestamp = str(round(timestamp,2))
                 filename = strtimestamp+'_'+str(imgFile)
                 n = n+1
