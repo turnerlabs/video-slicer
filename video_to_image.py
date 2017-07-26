@@ -20,10 +20,21 @@ if not os.path.exists(TMP_DIR):
 if not os.path.exists(TMP_RENAME):
     os.makedirs(TMP_RENAME)
 
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print '%s function took %0.3f ms' % (f.func_name, (time2-time1)*1000.0)
+        return ret
+    return wrap
+
+@timing
 def getLength(video):
     val = sp.check_output('ffprobe -i ' + str(video)+ ' -show_entries format=duration -v quiet -of csv="p=0"',stdin=None, stderr=None, shell=True, universal_newlines=False)
     return val
 
+@timing
 def convertVideoToImage(srcKey, srcBucket):
     s3 = boto3.resource('s3')
     localFilename = '/tmp/{}'.format(os.path.basename(srcKey))
@@ -48,7 +59,7 @@ def convertVideoToImage(srcKey, srcBucket):
         print imagesNo
         #cmd='ffmpeg -i ' + str(localFilename)+ ' -r ' + str(FRAMES) + ' ' + TMP_DIR + 'img_%04d.jpg'
         cmd = 'ffmpeg -i ' + str(localFilename) + ' -ss 00:00:0.0 -vf fps=' +str(FRAMES)+ ' -vframes ' + str(imagesNo) + ' ' + TMP_DIR + 'img_%04d.jpg'
-        #print cmd
+        print cmd
         sp.call(cmd,shell=True)
     except Exception as e:
         print("Error calling ffmpeg:", e)
@@ -65,8 +76,7 @@ def convertVideoToImage(srcKey, srcBucket):
                 timestamp = (1/FRAMES)*(n-1)
                 strtimestamp = str(round(timestamp,2))
                 filename = strtimestamp+'_'+str(imgFile)
-                n = n+1
-                print TMP_RENAME + filename
+                n = n + 1
                 os.rename(TMP_DIR + imgFile, TMP_RENAME + filename)
                 myzip.write(TMP_RENAME + filename)
 
