@@ -7,7 +7,7 @@ import datetime
 import sys
 import zipfile
 import math
-from time import time
+import time
 
 
 #No. of frames per second
@@ -26,7 +26,11 @@ def timing(f):
         time1 = time.time()
         ret = f(*args)
         time2 = time.time()
-        print '%s function took %0.3f ms' % (f.func_name, (time2-time1)*1000.0)
+        print '++++++++++++++++++++ TIMING ++++++++++++++++++++++++++++++++++++'
+        print ''
+        print '%s function took %0.3f m' % (f.func_name, ((time2-time1)/60))
+        print ''
+        print '++++++++++++++++++++ TIMING ++++++++++++++++++++++++++++++++++++'
         return ret
     return wrap
 

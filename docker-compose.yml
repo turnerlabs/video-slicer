@@ -1,11 +1,14 @@
 version: "2"
 services:
   video-slicer:
-    image: turnerlabs/video-slicer:0.1.0
+    image: turnerlabs/video-slicer:0.5.2
     environment:
       REGION: "us-east-1"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      FRAMESPERSEC: ${FRAMESPERSEC}
+      BUCKET: ${BUCKET}
+      FILE: ${FILE}
     labels:
-      composeToBatch.vcpus: 8
-      composeToBatch.memory: 200000
+      composeToBatch.vcpus: "8"
+      composeToBatch.memory: "20000"
